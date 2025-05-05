@@ -1,0 +1,4 @@
+fastmcp>=0.2.0
+slack_sdk>=3.21.0
+python-dotenv>=1.0.0
+pytest>=7.0.0

@@ -1,0 +1,493 @@
+{
+  "name": "slack_py",
+  "display_name": "Slack Python SDK",
+  "description": "MCP server for Slack workspace integration with pagination handling for large responses",
+  "version": "1.0.0",
+  "transport": {
+    "type": "stdio",
+    "command": [
+      "docker",
+      "run",
+      "--rm",
+      "-i",
+      "-e", "SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}",
+      "slack-mcp:latest"
+    ],
+    "env": {
+      "SLACK_BOT_TOKEN": {
+        "description": "Slack Bot User OAuth Token",
+        "required": true
+      },
+      "SUPABASE_URL": {
+        "description": "Supabase URL for optional data storage",
+        "required": false
+      },
+      "SUPABASE_SERVICE_ROLE_KEY": {
+        "description": "Supabase service role key for optional data storage",
+        "required": false
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "send_message",
+      "description": "Sends a message to a specified Slack channel or direct message. Can be used to post new messages or reply to threads. Supports both plain text and rich formatting with blocks.",
+      "parameters": {
+        "properties": {
+          "channel": {
+            "title": "Channel",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "thread_ts": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Ts"
+          },
+          "blocks": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocks"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_channels",
+      "description": "Retrieves a list of channels from the Slack workspace. Supports pagination for handling large workspaces. Returns channel IDs, names, topics, purposes, and member counts.",
+      "parameters": {
+        "properties": {
+          "types": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Types"
+          },
+          "exclude_archived": {
+            "default": true,
+            "title": "Exclude Archived",
+            "type": "boolean"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cursor"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_users",
+      "description": "Retrieves a list of users from the Slack workspace. Handles pagination automatically for workspaces with many users. Returns user IDs, names, real names, display names, emails (if available), and status.",
+      "parameters": {
+        "properties": {
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cursor"
+          },
+          "include_locale": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Include Locale"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "find_users_by_name",
+      "description": "Finds all Slack users whose real_name, display_name, or username contains the given substring (case-insensitive). Returns a list of matching user dicts.",
+      "parameters": {
+        "properties": {
+          "substring": {
+            "title": "Substring",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "read_channel_messages",
+      "description": "Retrieves message history from a specified channel. Can retrieve entire channel history or specific threads. Supports time-based filtering and pagination for handling large message volumes.",
+      "parameters": {
+        "properties": {
+          "channel": {
+            "title": "Channel",
+            "type": "string"
+          },
+          "limit": {
+            "default": 100,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "oldest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest"
+          },
+          "latest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest"
+          },
+          "inclusive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inclusive"
+          },
+          "thread_ts": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Ts"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_messages",
+      "description": "Searches for messages across all accessible channels using Slack's search functionality. Returns matching messages with channel context and highlights. Supports pagination for large result sets.",
+      "parameters": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "sort": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sort"
+          },
+          "sort_dir": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sort Dir"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "create_channel",
+      "description": "Creates a new channel in the Slack workspace. Channel names must be lowercase, without spaces or periods, and cannot be longer than 80 characters.",
+      "parameters": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "is_private": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Private"
+          },
+          "team_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Team Id"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "invite_to_channel",
+      "description": "Invites multiple users to a channel. The users must be valid members of the workspace, and the channel must exist.",
+      "parameters": {
+        "properties": {
+          "channel": {
+            "title": "Channel",
+            "type": "string"
+          },
+          "users": {
+            "title": "Users",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "upload_file",
+      "description": "Uploads a file to one or more Slack channels. Supports text files, images, PDFs, and other file types. Can be attached to threads and include an initial comment.",
+      "parameters": {
+        "properties": {
+          "channels": {
+            "title": "Channels",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "filetype": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filetype"
+          },
+          "initial_comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Initial Comment"
+          },
+          "thread_ts": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Ts"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_channel_info",
+      "description": "Retrieves detailed information about a specific channel, including its name, topic, purpose, creation date, creator, and optionally the number of members.",
+      "parameters": {
+        "properties": {
+          "channel": {
+            "title": "Channel",
+            "type": "string"
+          },
+          "include_num_members": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Include Num Members"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "update_message",
+      "description": "Updates the content of a previously sent message. Can only update messages that were sent by the same bot. Supports both text updates and block updates.",
+      "parameters": {
+        "properties": {
+          "channel": {
+            "title": "Channel",
+            "type": "string"
+          },
+          "ts": {
+            "title": "Ts",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "blocks": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocks"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "delete_message",
+      "description": "Permanently deletes a message from a channel. Can only delete messages that were sent by the same bot.",
+      "parameters": {
+        "properties": {
+          "channel": {
+            "title": "Channel",
+            "type": "string"
+          },
+          "ts": {
+            "title": "Ts",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_user_info",
+      "description": "Retrieves detailed profile information about a specific user, including their name, title, phone, email, status, and other profile fields.",
+      "parameters": {
+        "properties": {
+          "user": {
+            "title": "User",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    }
+  ]
+}
